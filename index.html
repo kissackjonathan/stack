@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STACK</title>
+<meta name="description" content="STACK: learn investing, one small step at a time.">
+<style>
+  :root { color-scheme: dark; }
+  html, body { height: 100%; margin: 0; }
+  body { background: #0b0d0c; color: #e4ebe6; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif;
+         display: grid; place-items: center; text-align: center; padding: 0 16px; box-sizing: border-box; }
+  .logo { width: 60px; height: 60px; margin: 0 auto 14px; border-radius: 18px; display: grid; place-items: center;
+          font-size: 30px; background: #16241b; border: 1px solid #22382a; }
+  .brand { color: #7fa88c; font-weight: 800; font-size: 22px; letter-spacing: .28em; padding-left: .28em; }
+  p { color: #9daaa0; font-size: 15px; margin: 18px 0 0; }
+  .spin { width: 22px; height: 22px; margin: 22px auto 0; border-radius: 50%; border: 3px solid #1e2722; border-top-color: #7fa88c;
+          animation: spin .9s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  a.btn { display: inline-block; margin-top: 18px; padding: 12px 22px; border-radius: 12px; background: #1d3a28; color: #fff;
+          text-decoration: none; font-weight: 600; }
+  .hidden { display: none; }
+  @media (prefers-reduced-motion: reduce) { .spin { animation: none; } }
+</style>
+</head>
+<body>
+<main>
+  <div class="logo">🌱</div>
+  <div class="brand">STACK</div>
+  <div id="wait"><div class="spin" aria-hidden="true"></div><p>Opening STACK…</p></div>
+  <div id="manual" class="hidden"><p>If nothing happens, tap below.</p><a class="btn" id="go" href="#">Open STACK</a></div>
+</main>
+<script>
+// The STACK app runs on a temporary public link that can change. Its current address is kept in link.txt,
+// updated automatically. We read it fresh (GitHub API first: no cache), then forward the visitor.
+(async () => {
+  const valid = u => /^https:\/\/[a-z0-9-]+\.trycloudflare\.com\/?$/.test((u || "").trim());
+  async function fromApi() {
+    const r = await fetch("https://api.github.com/repos/kissackjonathan/stack/contents/link.txt?ref=main&t=" + Date.now(),
+                          { headers: { Accept: "application/vnd.github.raw+json" }, cache: "no-store" });
+    if (!r.ok) throw new Error("api " + r.status);
+    return (await r.text()).trim();
+  }
+  async function fromPages() {
+    const r = await fetch("link.txt?t=" + Date.now(), { cache: "no-store" });
+    if (!r.ok) throw new Error("pages " + r.status);
+    return (await r.text()).trim();
+  }
+  let url = "";
+  for (const get of [fromApi, fromPages]) {
+    try { url = await get(); if (valid(url)) break; } catch (e) { /* try the next source */ }
+  }
+  if (!valid(url)) {
+    document.getElementById("wait").innerHTML = "<p>STACK is offline right now. Please try again a bit later.</p>";
+    return;
+  }
+  const target = url.replace(/\/$/, "") + "/";
+  document.getElementById("go").href = target;
+  setTimeout(() => document.getElementById("manual").classList.remove("hidden"), 2500);
+  location.replace(target);
+})();
+</script>
+</body>
+</html>
