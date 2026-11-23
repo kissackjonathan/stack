@@ -34,7 +34,7 @@
 // The STACK app runs on a temporary public link that can change. Its current address is kept in link.txt,
 // updated automatically. We read it fresh (GitHub API first: no cache), then forward the visitor.
 (async () => {
-  const valid = u => /^https:\/\/[a-z0-9-]+\.trycloudflare\.com\/?$/.test((u || "").trim());
+  const valid = u => /^https:\/\/[a-z0-9-]+\.(trycloudflare\.com|streamlit\.app)\/?$/.test((u || "").trim());
   async function fromApi() {
     const r = await fetch("https://api.github.com/repos/kissackjonathan/stack/contents/link.txt?ref=main&t=" + Date.now(),
                           { headers: { Accept: "application/vnd.github.raw+json" }, cache: "no-store" });
